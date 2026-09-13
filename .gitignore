@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+*.log
+*.tsbuildinfo
+.npmrc
+.env
+.env.*
+*.api.txt
+.DS_Store
