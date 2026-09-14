@@ -10,6 +10,9 @@ When public API routes, payloads, permissions or behavior change:
 4. Run the public-contract drift check below. The input is public documentation only, not server implementation.
 5. Update `package.json`, its lockfile, `src/core.ts` and `CHANGELOG.md`; build, audit `npm pack --ignore-scripts`, and test installation of the actual tarball.
 6. Publish an immutable Git tag/release and the reviewed npm tarball. Verify public registry metadata/integrity and a clean install from npm.
+   Keep the README's manual-download link on the new prebuilt GitHub `.tgz` asset.
+   Extract and test the published tarball outside a Node project, without npm or
+   `node_modules`, using both local ESM and CommonJS imports. Include TypeScript declarations.
 
 ```bash
 node tools/check-api-coverage.mjs /path/to/api-docs.js /path/to/api-examples.js

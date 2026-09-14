@@ -2,15 +2,61 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **1.0.0** targets merchant API **v1**, tested against merchant **3.5.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **1.0.1** targets merchant API **v1**, tested against merchant **3.5.0**. SDK and merchant versions are independent.
 
 ## Install
+
+### With npm
 
 ```bash
 npm install whollycrypto
 ```
 
 Use this SDK on your **server**, not in a browser or mobile app. API keys must never reach customer devices. Use a security-maintained Node.js release.
+
+### Without npm (manual download)
+
+1. [Download the prebuilt SDK 1.0.1](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v1.0.1/whollycrypto-1.0.1.tgz).
+2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
+3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
+
+**JavaScript ES modules** (`app.mjs`, or a project using `"type": "module"`):
+
+```javascript
+import {Client} from './whollycrypto-node-sdk/dist/index.mjs';
+
+const client = new Client('https://api.your-domain.com', process.env.WHOLLY_API_TOKEN);
+// Use the invoice/payment methods below, then client.close() on shutdown.
+```
+
+**CommonJS** (`app.cjs`):
+
+```javascript
+const {Client} = require('./whollycrypto-node-sdk/dist/index.js');
+
+const client = new Client('https://api.your-domain.com', process.env.WHOLLY_API_TOKEN);
+```
+
+**TypeScript (ES modules)** uses the same local entrypoint and included declarations:
+
+```typescript
+import {Client, type InvoiceCreate} from './whollycrypto-node-sdk/dist/index.mjs';
+
+const payload: InvoiceCreate = {amount: '10.00', currency: 'EUR'};
+```
+
+For CommonJS TypeScript, import from `./whollycrypto-node-sdk/dist/index.js` instead.
+
+Adjust the relative path to match your script. Set `WHOLLY_API_TOKEN` on your server
+using a credential from **Settings → API access**. Replace `'whollycrypto'` in the
+other examples with the local entrypoint; all methods and signature helpers are identical.
+
+No npm install, `node_modules/` or build step is needed to run JavaScript. Node.js
+22+ is still required; TypeScript source uses your application's existing TypeScript tooling.
+Choose the **prebuilt `.tgz` asset**, not GitHub's automatic **Source code** download:
+the source archive contains TypeScript and needs development tools to build it.
+For a manual update, download a newer prebuilt release and replace the SDK folder;
+keep your application code and credentials outside it.
 
 ## Create an invoice
 

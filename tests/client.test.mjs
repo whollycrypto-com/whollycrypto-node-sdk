@@ -10,7 +10,7 @@ const fixture=JSON.parse(await readFile(new URL('./fixtures/api-v1.json',import.
 
 test('ESM and CommonJS use the same classes and version',()=>{
   const sdk=createRequire(import.meta.url)('whollycrypto');
-  assert.equal(VERSION,'1.0.0');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
+  assert.equal(VERSION,'1.0.1');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
   assert.equal(sdk.APIError,APIError);assert.equal(sdk.default,Client);
 });
 test('all 17 merchant endpoints match public fixtures and authorization',async t=>{
