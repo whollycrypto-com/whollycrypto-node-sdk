@@ -4,7 +4,7 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.0.0** targets merchant API **v1**, tested against merchant **4.0.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.1.0** targets merchant API **v1**, tested against merchant **4.1.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.0.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.0.0/whollycrypto-2.0.0.tgz).
+1. [Download the prebuilt SDK 2.1.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.1.0/whollycrypto-2.1.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -209,7 +209,9 @@ const notice = parseNotification(rawBody, request.rawHeaders, signingSecret);
 
 Catch `InvalidSignatureError` and return HTTP 400. Configuration errors should fail closed. Verification uses HMAC-SHA256, constant-time comparison and a five-minute past/future clock window; keep the server clock synchronized. `verifySignature()` is available for signature-only checks. `parseNotification()` also validates UUIDs, status and sequence, and returns a deeply readonly payload. Body size is limited to 256 KiB.
 
-**Event/delivery ID headers are not signed.** Do not use them alone for replay protection. Use the signed public invoice ID and sequence scoped to your configured project. Re-fetch the authenticated invoice before fulfilment, prevent state regression and handle fulfilment atomically. Event names are not included in the payload or headers.
+**Event/delivery ID headers are not signed.** Version 2 signs `event_id`, `event_type`, `project_id` and `store_id` inside the body. Legacy events keep their old format. Match receiver scope, re-fetch the authenticated invoice before fulfilment and handle orders exactly once. Different event types can share a revision: compare the original nine invoice-state fields, not the whole body, when deduplicating by invoice/sequence.
+
+`payment_info` includes chain/token amounts, remaining funds, confirmations, locked quote/spread/tolerance, advisory market rates and bounded transfers. Use `client.listInvoicePayments(projectId, invoiceId, {limit: 25, offset: 0})` for complete current observations. Keep metadata and customer data private.
 
 The [Express-compatible receiver example](https://github.com/whollycrypto-com/whollycrypto-node-sdk/blob/main/examples/webhook-handler.mjs) verifies before calling your durable queue, returns 503 if storage fails, and never starts a server or fulfils an order. Mount it with `express.raw()` before any JSON parser. You must supply the transactional, persistent queue/deduplication implementation; an in-memory map is not sufficient. Express is optional and is not an SDK dependency.
 
@@ -276,4 +278,4 @@ npm run check
 npm pack --ignore-scripts
 ```
 
-Tests use mocks and local HTTP/TLS servers, never live invoices or funds. OpenSSL is needed for temporary test certificates. The suite covers all 17 public merchant routes, precision, idempotency, callbacks, TLS, connection reuse and cancellation. See [maintenance notes](https://github.com/whollycrypto-com/whollycrypto-node-sdk/blob/main/docs/maintaining.md).
+Tests use mocks and local HTTP/TLS servers, never live invoices or funds. OpenSSL is needed for temporary test certificates. The suite covers all 18 public merchant routes, precision, idempotency, callbacks, TLS, connection reuse and cancellation. See [maintenance notes](https://github.com/whollycrypto-com/whollycrypto-node-sdk/blob/main/docs/maintaining.md).

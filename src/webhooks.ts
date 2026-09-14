@@ -75,6 +75,11 @@ export function parseNotification(rawBody: Uint8Array, headers: NotificationHead
     uuid(payload.invoice_id);
     if ((typeof payload.sequence !== 'number' && typeof payload.sequence !== 'string') || !/^[1-9][0-9]{0,18}$/.test(String(payload.sequence))
         || BigInt(payload.sequence) > 9_223_372_036_854_775_807n) throw Error();
+    if (Object.hasOwn(payload, 'payload_version')) {
+      if (payload.payload_version !== 2 || uuid(payload.event_id) !== eventId || typeof payload.event_type !== 'string'
+          || !['invoice.created','payment.received','invoice.processing','invoice.settled','invoice.expired','invoice.invalid','invoice.cancelled'].includes(payload.event_type)) throw Error();
+      uuid(payload.project_id); uuid(payload.store_id);
+    }
     return new Notification(eventId, deliveryId, freeze(payload as JsonValue) as NotificationPayload);
   } catch { throw new InvalidSignatureError('Signed notification has invalid identifiers or payload.'); }
 }

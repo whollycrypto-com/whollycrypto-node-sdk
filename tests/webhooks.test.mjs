@@ -12,11 +12,13 @@ const body=Buffer.from(JSON.stringify({invoice_id:INVOICE,status:'settled',seque
 const headers=(raw=body,now=NOW)=>({'Wholly-Signature':signed(raw,now),'Wholly-Event-Id':PROJECT,'Wholly-Delivery-Id':STORE});
 test('documented callback snapshot verifies for every invoice status',()=>{
   const payload=JSON.parse(readFileSync(new URL('../examples/notification.json',import.meta.url),'utf8'));
-  assert.equal(Object.keys(payload).length,9);assert.equal(payload.amount,'49.9');assert.equal(payload.currency,'EUR');
+  assert.equal(payload.payload_version,2);assert.equal(payload.amount,'49.9');assert.equal(payload.currency,'EUR');
   for(const status of ['new','processing','settled','expired','invalid','cancelled']){
     const raw=Buffer.from(JSON.stringify({...payload,status}));
-    assert.equal(parseNotification(raw,headers(raw),SECRET,{now:NOW}).status,status);
-    assert.throws(()=>parseNotification(raw,headers(raw),'another-endpoint-secret',{now:NOW}),InvalidSignatureError);
+    const h={...headers(raw),'Wholly-Event-Id':payload.event_id};
+    assert.equal(parseNotification(raw,h,SECRET,{now:NOW}).status,status);
+    assert.throws(()=>parseNotification(raw,headers(raw),SECRET,{now:NOW}),InvalidSignatureError);
+    assert.throws(()=>parseNotification(raw,h,'another-endpoint-secret',{now:NOW}),InvalidSignatureError);
   }
 });
 test('exact HMAC bytes, clock boundaries and invalid signatures',()=>{
@@ -56,4 +58,23 @@ test('receiver example verifies before storage and never acknowledges failed enq
   res=response();await handler({...req,body:JSON.parse(body)},res);assert.equal(res.code,400);
   const failing=createWebhookHandler({projectId:PROJECT,signingSecret:SECRET,enqueue:async()=>{throw Error('storage failed');}});
   res=response();await failing(req,res);assert.equal(res.code,503);
+});
+
+test('v2 receiver accepts separate events at one revision and rejects wrong signed scope',async()=>{
+  const now=Math.floor(Date.now()/1000),base=JSON.parse(body),queue=new Map();
+  const handler=createWebhookHandler({projectId:PROJECT,signingSecret:SECRET,enqueue:async item=>{
+    if(queue.has(item.replayKey)&&queue.get(item.replayKey)!==item.invoiceState)throw Error('Conflicting invoice state');
+    queue.set(item.replayKey,item.invoiceState);
+  }});
+  const deliver=async fields=>{
+    const raw=Buffer.from(JSON.stringify({...base,payload_version:2,project_id:PROJECT,store_id:STORE,event_id:ASSET,event_type:'payment.received',...fields}));
+    const h={...headers(raw,now),'Wholly-Event-Id':JSON.parse(raw).event_id};
+    const res={code:0,status(code){this.code=code;return this;},end(){return this;}};
+    await handler({method:'POST',body:raw,rawHeaders:Object.entries(h).flat()},res);return res.code;
+  };
+  assert.equal(await deliver({}),204);
+  assert.equal(await deliver({event_id:STORE,event_type:'invoice.settled',payment_info:{method_count:1}}),204);
+  assert.equal(queue.size,1);
+  assert.equal(await deliver({project_id:ASSET}),400);
+  assert.equal(await deliver({status:'invalid'}),503);
 });

@@ -22,6 +22,7 @@ export function invoke(client,id,body){
     'api-service-root':()=>client.serviceInfo(),'api-health':()=>client.health(),
     'create-invoice':()=>client.createInvoice(PROJECT,STORE,body,'saved-order-1042'),
     'get-invoice':()=>client.getInvoice(PROJECT,INVOICE),
+    'list-invoice-payments':()=>client.listInvoicePayments(PROJECT,INVOICE,{limit:25,offset:0}),
     'list-invoices':()=>client.listInvoices(PROJECT,{search:'order-1042',limit:50,offset:0}),
     'list-project-payment-assets':()=>client.listProjectPaymentAssets(PROJECT),
     'update-project-payment-asset':()=>client.updateProjectPaymentAsset(PROJECT,ASSET,body),

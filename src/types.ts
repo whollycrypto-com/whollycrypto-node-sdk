@@ -58,6 +58,7 @@ export interface PaymentIntent extends APIObject {
   confirmed_amount: DecimalString; confirmed_amount_atomic: string;
   minimum_payment_amount?: DecimalString; minimum_payment_amount_atomic?: string;
   quote_rate?: DecimalString; payment_rail?: string; payment_uri?: string | null; payable?: boolean;
+  quote_details?: APIObject | null;
   destination_address?: string | null; destination_tag?: string | null;
   finality_mode?: string; required_confirmations?: number;
   quote_expires_at?: string; monitoring_expires_at?: string;
@@ -69,6 +70,20 @@ export interface InvoicePage extends Envelope<Invoice[]> {
   pagination: {limit: number; offset: number; total: number | string; has_more: boolean};
 }
 export interface InvoiceFilters extends Query { store_id?: UUID; status?: InvoiceStatus; search?: string; limit?: number; offset?: number; }
+export interface InvoicePaymentFilters extends Query { payment_method_id?: UUID; limit?: number; offset?: number; }
+export interface InvoicePayment extends APIObject {
+  payment_id: UUID; payment_method_id: UUID; transaction_id: string | null; payment_hash: string | null;
+  event_index: number; payment_rail: 'onchain' | 'lightning'; chain_slug: string; network: string;
+  asset_id: UUID; asset_key: string; caip_asset_id: string | null; symbol: string; asset_decimals: number;
+  amount: DecimalString; amount_atomic: string;
+  status: 'detected' | 'confirming' | 'final' | 'reorged' | 'replaced' | 'invalid'; counts_towards_received: boolean;
+  confirmations: number | null; block_height: number | string | null;
+  observed_at: string; chain_time: string | null; finalized_at: string | null;
+  explorer_name: string | null; explorer_url: string | null;
+}
+export interface InvoicePaymentPage extends Envelope<InvoicePayment[]> {
+  invoice_id: UUID; pagination: {limit: number; offset: number; total: number | string; has_more: boolean};
+}
 export interface TokenFilters extends Query { q?: string; limit?: number; }
 export interface TokenRegistration { chain_slug: string; coingecko_id: string; enabled?: boolean; }
 export type CustomTokenRegistration = {
