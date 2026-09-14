@@ -79,7 +79,7 @@ try {
     '11111111-1111-4111-8111-111111111111', // Your Project API ID
     '22222222-2222-4222-8222-222222222222', // Your Store API ID
     {
-      amount: '49.90', // A string, never a JavaScript number
+      amount: '49.90', // From a variable: amount: String(amount)
       currency: 'EUR',
       order_id: 'order-1042',
       email: 'customer@example.com',
@@ -111,7 +111,7 @@ Types ship in the package; no separate `@types/whollycrypto` installation is nee
 import {Client, type InvoiceCreate, type InvoiceResult} from 'whollycrypto';
 
 const payload: InvoiceCreate = {
-  amount: '25.00', currency: 'USD',
+  amount: '25.00', currency: 'USD', // Or: amount: String(amount)
   exchange_rate_spread_percent: '0.5',
   underpayment_tolerance_percent: '1',
   expires_in_seconds: 900,
@@ -184,9 +184,17 @@ See [payment-method examples](https://github.com/whollycrypto-com/whollycrypto-n
 
 `updateStorePaymentAssets()` takes the list itself, not an `assets` wrapper. `[]` removes **all on-chain selections**; it does not configure Lightning. Sending funds, refunds, reconciliation decisions, accounts, exchange credentials and Lightning configuration are console-only. The SDK does not invent public routes for them.
 
+Keep amounts as decimal strings from the start. `String(amount)` converts a variable to the required string type, but cannot recover precision already lost through floating-point calculations. Keep the original decimal text; do not calculate payment totals with floats.
+
 ## Verify IPN and webhooks
 
-Both use the same signature format. Use the **store's IPN/webhook signing secret**, not an API token. Pass the **exact raw body bytes**, before JSON parsing.
+IPN sends every generated invoice event to the store default URL or invoice's `ipn_url`. Webhooks send only selected events. Both deliver the same JSON snapshot. Use **Store → IPN's secret for IPN** and **the individual webhook endpoint's secret for webhooks**, never an API token. Rotating one does not rotate the others. Pass the **exact raw body bytes**, before JSON parsing.
+
+**Fulfil on `status = settled`, not `processing` or `amount_status = paid`.** Invoice statuses are `new`, `processing`, `settled`, `expired`, `invalid`, `cancelled`. Underpaid/overpaid use `amount_status`; lateness uses `timing_status`.
+
+The body contains `invoice_id` (public UUID), `status`, `amount_status`, `timing_status`, `resolution`, `sequence`, `amount`, `currency`, `order_id`. `amount` is the invoice total, not crypto received. Event names, transaction hashes, chain/token, customer data and metadata are not sent; fetch the full invoice via API.
+
+[IPN/webhook setup and receiver example](examples/ipn-webhooks.md) · [Integration guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Event table and full payload](https://www.whollycrypto.com/api/#notifications). Also available in your console at `/settings/api/docs/#notifications`.
 
 ```javascript
 import {parseNotification, InvalidSignatureError} from 'whollycrypto';

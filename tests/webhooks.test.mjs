@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHmac} from 'node:crypto';
 import {inspect} from 'node:util';
+import {readFileSync} from 'node:fs';
 import {parseNotification,verifySignature,InvalidSignatureError,ValidationError} from 'whollycrypto';
 import {createWebhookHandler} from '../examples/webhook-handler.mjs';
 import {INVOICE,PROJECT,STORE,ASSET} from './helpers.mjs';
@@ -9,6 +10,15 @@ const SECRET='isolated-callback-signing-fixture',NOW=1800000000;
 const signed=(body,now=NOW)=>'t='+now+',v1='+createHmac('sha256',SECRET).update(String(now)+'.').update(body).digest('hex');
 const body=Buffer.from(JSON.stringify({invoice_id:INVOICE,status:'settled',sequence:4,amount:'25.00',currency:'EUR',metadata:{customer:'private fixture',items:[1,2]}}));
 const headers=(raw=body,now=NOW)=>({'Wholly-Signature':signed(raw,now),'Wholly-Event-Id':PROJECT,'Wholly-Delivery-Id':STORE});
+test('documented callback snapshot verifies for every invoice status',()=>{
+  const payload=JSON.parse(readFileSync(new URL('../examples/notification.json',import.meta.url),'utf8'));
+  assert.equal(Object.keys(payload).length,9);assert.equal(payload.amount,'49.9');assert.equal(payload.currency,'EUR');
+  for(const status of ['new','processing','settled','expired','invalid','cancelled']){
+    const raw=Buffer.from(JSON.stringify({...payload,status}));
+    assert.equal(parseNotification(raw,headers(raw),SECRET,{now:NOW}).status,status);
+    assert.throws(()=>parseNotification(raw,headers(raw),'another-endpoint-secret',{now:NOW}),InvalidSignatureError);
+  }
+});
 test('exact HMAC bytes, clock boundaries and invalid signatures',()=>{
   for(const now of [NOW-300,NOW,NOW+300])assert.equal(verifySignature(body,signed(body),SECRET,{now}),true);
   for(const now of [NOW-301,NOW+301])assert.equal(verifySignature(body,signed(body),SECRET,{now}),false);

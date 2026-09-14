@@ -1,6 +1,9 @@
 import {InvalidSignatureError, parseNotification} from 'whollycrypto';
 
 /**
+ * IPN and webhooks use this same receiver. See ipn-webhooks.md and notification.json.
+ * Configure the Store -> IPN secret for IPN, or that webhook endpoint's own secret.
+ * Use separate trusted routes; never select a secret from unverified request data.
  * Mount AFTER express.raw({type:'application/json', limit:'256kb'}), not express.json().
  * enqueue must commit to YOUR durable database/queue before resolving. Reject on
  * storage failure. It must atomically deduplicate the replayKey and reject conflicting

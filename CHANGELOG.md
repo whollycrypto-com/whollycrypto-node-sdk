@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Explain IPN versus webhook selection and secrets, all invoice statuses and the complete callback body.
+- Add callback setup/worker guidance and a verified JSON sample in examples, with links to the live documentation.
+- Show string casts for amount variables and explain why floating-point calculations lose precision.
+
+
 SDK versions are independent of merchant versions.
 
 ## 1.0.1 - 2026-09-14
