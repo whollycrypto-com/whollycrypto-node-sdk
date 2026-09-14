@@ -36,7 +36,7 @@ export interface InvoiceCreate {
 export interface APIObject { [key: string]: unknown; }
 export interface Envelope<T> extends APIObject { data: T; }
 export interface Invoice extends APIObject {
-  id: UUID; public_id: UUID; project_id: UUID; store_id: UUID;
+  id: UUID; invoice_id: UUID; project_id: UUID; store_id: UUID;
   amount: DecimalString; currency: string; status: InvoiceStatus;
   sequence: number | string; order_id: string | null; email: string | null;
   created_at: string; expires_at: string;

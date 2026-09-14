@@ -5,7 +5,7 @@ import {createHmac} from 'node:crypto';
 import * as sdk from './whollycrypto-node-sdk/dist/index.mjs';
 
 const cjs = createRequire(import.meta.url)('./whollycrypto-node-sdk/dist/index.js');
-assert.equal(sdk.VERSION, '1.0.1');
+assert.equal(sdk.VERSION, '2.0.0');
 for (const name of Object.keys(sdk)) assert.equal(sdk[name], cjs[name]);
 const project = '11111111-1111-4111-8111-111111111111';
 const store = '22222222-2222-4222-8222-222222222222';
@@ -19,7 +19,7 @@ const transport = {
     assert.equal(request.headers['Idempotency-Key'], 'saved-manual-fixture-key');
     assert.equal(request.body.toString(), JSON.stringify({amount, currency: 'EUR'}));
     return new sdk.HTTPResponse(200, {'content-type': 'application/json'}, Buffer.from(JSON.stringify({
-      data: {public_id: invoice, amount}, links: {checkout: 'https://pay.example.test/invoice/' + invoice},
+      data: {invoice_id: invoice, amount}, links: {checkout: 'https://pay.example.test/invoice/' + invoice},
     })));
   },
 };
@@ -27,7 +27,7 @@ for (const Client of [sdk.Client, cjs.Client]) {
   const client = new Client('https://api.example.test', token, {transport});
   try {
     const result = await client.createInvoice(project, store, {currency: 'EUR', amount}, 'saved-manual-fixture-key');
-    assert.equal(result.data.public_id, invoice);
+    assert.equal(result.data.invoice_id, invoice);
     assert.equal(result.data.amount, amount);
   } finally { client.close(); }
 }

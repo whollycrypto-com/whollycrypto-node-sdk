@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 - 2026-09-14
+
+- Target merchant 4.0.0: invoice responses and TypeScript declarations use `invoice_id`, matching IPN/webhooks; `public_id` is removed. Update custom response readers before upgrading the merchant.
+- Refresh all request/response fixtures, create/list examples and history documentation. Node.js 22+ support and callback verification are unchanged.
 
 - Explain IPN versus webhook selection and secrets, all invoice statuses and the complete callback body.
 - Add callback setup/worker guidance and a verified JSON sample in examples, with links to the live documentation.

@@ -12,5 +12,5 @@ export async function createOrderCheckout(client: Client, request: {
   const result = await client.createInvoice(
     request.projectId, request.storeId, request.payload, request.idempotencyKey,
   );
-  return {publicInvoiceId: result.data.public_id, checkoutURL: result.links.checkout};
+  return {publicInvoiceId: result.data.invoice_id, checkoutURL: result.links.checkout};
 }

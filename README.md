@@ -1,8 +1,10 @@
 # Wholly Crypto Node.js SDK
 
+**Merchant 4 upgrade:** read `data.invoice_id` from invoice creation/detail and `invoice_id` from list rows. It matches the callback `invoice_id`. The server no longer returns `public_id`; internal `id` is not a checkout ID. Update custom response readers before upgrading your merchant. For older merchants, keep SDK 1.x or explicitly handle their older response shape.
+
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **1.0.1** targets merchant API **v1**, tested against merchant **3.5.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.0.0** targets merchant API **v1**, tested against merchant **4.0.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -16,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 1.0.1](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v1.0.1/whollycrypto-1.0.1.tgz).
+1. [Download the prebuilt SDK 2.0.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.0.0/whollycrypto-2.0.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -91,7 +93,7 @@ try {
     idempotencyKey,
   );
 
-  const publicInvoiceId = result.data.public_id;
+  const publicInvoiceId = result.data.invoice_id;
   const checkoutURL = result.links.checkout;
   // Save publicInvoiceId with the order; return checkoutURL to your customer.
 } finally {
@@ -157,7 +159,7 @@ for await (const invoice of client.iterateInvoices(projectId, {status: 'settled'
 }
 ```
 
-These snippets assume an open client. Invoice paths use `public_id`, not internal `id` or `order_id`. `processing` is not `settled`. Offset pages are separate snapshots: deduplicate by public invoice ID when exporting during incoming payments.
+These snippets assume an open client. Invoice paths use `invoice_id`, not internal `id` or `order_id`. `processing` is not `settled`. Offset pages are separate snapshots: deduplicate by public invoice ID when exporting during incoming payments.
 
 ## API coverage
 

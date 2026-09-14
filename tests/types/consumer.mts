@@ -5,7 +5,7 @@ async function example() {
   const result = await client.createInvoice('project','store',invoice,'saved');
   const url: string = result.links.checkout;
   const amount: string = result.data.amount;
-  for await (const entry of client.iterateInvoices('project')) { const id: string = entry.public_id; void id; }
+  for await (const entry of client.iterateInvoices('project')) { const id: string = entry.invoice_id; void id; }
   const checkout = new CheckoutClient('https://pay.example.com');
   await checkout.getInvoice('public-id',{signal:new AbortController().signal});
   return [url,amount];

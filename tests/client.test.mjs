@@ -10,7 +10,7 @@ const fixture=JSON.parse(await readFile(new URL('./fixtures/api-v1.json',import.
 
 test('ESM and CommonJS use the same classes and version',()=>{
   const sdk=createRequire(import.meta.url)('whollycrypto');
-  assert.equal(VERSION,'1.0.1');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
+  assert.equal(VERSION,'2.0.0');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
   assert.equal(sdk.APIError,APIError);assert.equal(sdk.default,Client);
 });
 test('all 17 merchant endpoints match public fixtures and authorization',async t=>{
@@ -20,7 +20,7 @@ test('all 17 merchant endpoints match public fixtures and authorization',async t
     const result=await invoke(client,endpoint.id,structuredClone(endpoint.body));
     assert.deepEqual(result,endpoint.response);
     const request=transport.requests[0];
-    const expected=endpoint.path.replace('{project_id}',PROJECT).replace('{store_id}',STORE).replace('{public_id}',INVOICE).replace('{asset_id}',ASSET);
+    const expected=endpoint.path.replace('{project_id}',PROJECT).replace('{store_id}',STORE).replace('{invoice_id}',INVOICE).replace('{asset_id}',ASSET);
     assert.equal(request.method,endpoint.method);assert.equal(new URL(request.url).pathname,expected);
     assert.equal(request.headers.Authorization,endpoint.access==='public'?undefined:'Bearer '+TOKEN);
     if(endpoint.body===null)assert.equal(request.body,undefined);
@@ -44,7 +44,7 @@ test('unsafe integers and fractional response literals retain their exact value'
   assert.deepEqual(result.data,{atomic:'999999999999999999999999',rate:'0.1234567890123456789',exponent:'1e-30',count:7,amount:'0.000000000000000001'});
 });
 test('opt-in retries reuse the exact invoice request and credential',async()=>{
-  const transport=new FakeTransport(new TransportError('test',true),reply({},503,{'retry-after':'0'}),reply({data:{public_id:INVOICE}}));
+  const transport=new FakeTransport(new TransportError('test',true),reply({},503,{'retry-after':'0'}),reply({data:{invoice_id:INVOICE}}));
   const client=make(transport,{maxRetries:2,maxRetryDelayMs:0});
   await client.createInvoice(PROJECT,STORE,{amount:'10.00'},'persisted');
   assert.equal(transport.requests.length,3);
@@ -96,10 +96,10 @@ test('redirects, invalid JSON and malformed envelopes fail safely',async()=>{
   assert.equal(Object.getPrototypeOf(result),Object.prototype);assert.equal({}.polluted,undefined);assert.equal(result.__proto__.polluted,true);
 });
 test('invoice iteration is lazy, bounded and rejects stalled pagination',async()=>{
-  const transport=new FakeTransport(reply({data:[{public_id:INVOICE}],pagination:{limit:1,offset:0,has_more:true}}),reply({data:[{public_id:STORE}],pagination:{limit:1,offset:1,has_more:false}}));
+  const transport=new FakeTransport(reply({data:[{invoice_id:INVOICE}],pagination:{limit:1,offset:0,has_more:true}}),reply({data:[{invoice_id:STORE}],pagination:{limit:1,offset:1,has_more:false}}));
   const iterator=make(transport).iterateInvoices(PROJECT,{limit:1});assert.equal(transport.requests.length,0);
-  assert.equal((await iterator.next()).value.public_id,INVOICE);assert.equal(transport.requests.length,1);
-  assert.equal((await iterator.next()).value.public_id,STORE);assert.equal(transport.requests.length,2);assert.equal((await iterator.next()).done,true);
+  assert.equal((await iterator.next()).value.invoice_id,INVOICE);assert.equal(transport.requests.length,1);
+  assert.equal((await iterator.next()).value.invoice_id,STORE);assert.equal(transport.requests.length,2);assert.equal((await iterator.next()).done,true);
   for(const page of [{data:[],pagination:{limit:50,offset:0,has_more:true}},{data:[],pagination:{limit:50,offset:1,has_more:false}}]){
     const it=make(new FakeTransport(reply(page))).iterateInvoices(PROJECT);await assert.rejects(it.next(),InvalidResponseError);
   }
