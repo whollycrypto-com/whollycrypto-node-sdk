@@ -14,14 +14,17 @@ test('documented callback snapshot verifies for every invoice status',()=>{
   const payload=JSON.parse(readFileSync(new URL('../examples/notification.json',import.meta.url),'utf8'));
   assert.equal(payload.payload_version,2);assert.equal(payload.amount,'49.9');assert.equal(payload.currency,'EUR');
   assert.equal(payload.paid_chain,'ethereum');assert.equal(payload.paid_asset,'USDC');
+  assert.equal(payload.paid_asset_amount,'58.17342');assert.equal(payload.paid_asset_amount_received,'58.17342');
   assert.equal(payload.settlement_exchange_rate.rate,'1.17');
   for(const status of ['new','processing','settled','expired','invalid','cancelled']){
     const entry={...payload,status};
-    if(status!=='settled')for(const key of ['paid_chain','paid_asset','paid_payment_method_id','settlement_exchange_rate'])entry[key]=null;
+    if(status!=='settled')for(const key of ['paid_chain','paid_asset','paid_asset_amount','paid_asset_amount_received','paid_payment_method_id','settlement_exchange_rate'])entry[key]=null;
     const raw=Buffer.from(JSON.stringify(entry));
     const h={...headers(raw),'Wholly-Event-Id':payload.event_id};
     const parsed=parseNotification(raw,h,SECRET,{now:NOW});
     assert.equal(parsed.status,status);assert.equal(parsed.payload.paid_chain,entry.paid_chain);
+    assert.equal(parsed.payload.paid_asset_amount,entry.paid_asset_amount);
+    assert.equal(parsed.payload.paid_asset_amount_received,entry.paid_asset_amount_received);
     assert.deepEqual(parsed.payload.settlement_exchange_rate,entry.settlement_exchange_rate);
     assert.throws(()=>parseNotification(Buffer.from(raw.toString().replaceAll('1.17','9.99')+' '),h,SECRET,{now:NOW}),InvalidSignatureError);
     assert.throws(()=>parseNotification(raw,headers(raw),SECRET,{now:NOW}),InvalidSignatureError);
