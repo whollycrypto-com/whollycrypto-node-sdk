@@ -4,7 +4,7 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.1.0** targets merchant API **v1**, tested against merchant **4.1.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.2.0** targets merchant API **v1**, tested against merchant **5.1.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.1.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.1.0/whollycrypto-2.1.0.tgz).
+1. [Download the prebuilt SDK 2.2.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.2.0/whollycrypto-2.2.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -104,6 +104,26 @@ try {
 These UUIDs are placeholders. A success/return URL is **not proof of payment**. Fulfil only after checking the authenticated invoice, matching the stored order, project/store and amount/currency, then committing fulfilment exactly once.
 
 For a long-running application, reuse one client and close it during shutdown after outstanding requests finish. HTTPS connections are pooled; all network methods return promises. ESM and CommonJS share the same classes, so `instanceof APIError` works across both.
+
+## Choose invoice payment methods
+
+Merchant 5.1.0+ accepts an invoice-specific subset of the store's accepted methods:
+
+```javascript
+payload.payment_methods = [
+  {chain_slug: 'ethereum', asset_ids: [storeUsdcAssetId]},
+  {chain_slug: 'bitcoin', payment_rail: 'lightning'},
+];
+```
+
+Get `storeUsdcAssetId` from `await client.listStorePaymentAssets(projectId, storeId)`:
+use a selected entry's `asset.id`, not its contract, symbol or invoice method ID.
+Omit `asset_ids` for all ready accepted assets on the chain. Omit `payment_methods`
+or use `null` for all store methods; `[]` is invalid. Bitcoin Lightning is separate
+from on-chain Bitcoin. Maximum 64 methods; disabled, wrong-chain or unavailable
+choices fail. Store settings are unchanged. Keep the exact payload and idempotency
+key for retries. `InvoicePaymentSelection` is exported for TypeScript users.
+See [the selection schema and examples](https://www.whollycrypto.com/api/#create-invoice).
 
 ## TypeScript
 

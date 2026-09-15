@@ -24,7 +24,12 @@ export interface CheckoutAppearanceOverride {
   support_email?: string; support_url?: string; terms_url?: string; privacy_url?: string;
   return_button_text?: string;
 }
+/** A subset of store methods; omit asset_ids for the chain's ready accepted assets. */
+export type InvoicePaymentSelection =
+  | {chain_slug: string; payment_rail?: 'onchain'; asset_ids?: UUID[] | null}
+  | {chain_slug: 'bitcoin'; payment_rail: 'lightning'; asset_ids?: never};
 export interface InvoiceCreate {
+  payment_methods?: InvoicePaymentSelection[] | null;
   amount: DecimalString; currency?: string | null; order_id?: string | null;
   email?: string | null; description?: string | null; expires_in_seconds?: number | null;
   exchange_rate_spread_percent?: DecimalString | null; underpayment_tolerance_percent?: DecimalString | null;
