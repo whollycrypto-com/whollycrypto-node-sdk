@@ -58,6 +58,17 @@ await client.updateStoreConfirmationPolicy(projectId, storeId, bitcoinAssetId, {
 
 Passing `[]` clears **all on-chain selections**. Lightning is configured separately in the console and its readiness appears in `lightning`. Zero confirmations permits settlement on detection and increases reversal/double-spend risk. Finality-only chains may reject editable confirmation counts.
 
+## Invoice-specific selection
+
+On merchant 5.3.0+, select already accepted tokens with `chain_slug` and
+`asset_tickers`, for example `{"chain_slug":"ethereum","asset_tickers":["USDC","USDT"]}`.
+Copy the object in **Project → Stores → Payment methods**, then put it inside
+the invoice's `payment_methods` array. Tickers are case-insensitive and chain-scoped.
+They never enable new store assets. Duplicate accepted symbols are rejected;
+use `asset_ids` with the selected entry's `asset.id` for an exact contract instead.
+Do not send both selectors. Omit both to choose all ready assets on that chain.
+See the [complete invoice example](../README.md#choose-invoice-payment-methods).
+
 ## Balances and exceptions
 
 ```javascript

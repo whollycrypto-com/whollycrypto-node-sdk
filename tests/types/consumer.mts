@@ -2,6 +2,11 @@ import Client, {Client as NamedClient, CheckoutClient, parseNotification, APIErr
 const client: NamedClient = new Client('https://api.example.com','fixture');
 const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',checkout_appearance:{intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'}}}};
 invoice.payment_methods=[{chain_slug:'ethereum',asset_ids:['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa']},{chain_slug:'bitcoin',payment_rail:'lightning'}];
+invoice.payment_methods=[{chain_slug:'ethereum',asset_tickers:['USDC','USDT']},{chain_slug:'bitcoin',payment_rail:'lightning',asset_tickers:['BTC']}];
+// @ts-expect-error Select tickers or UUIDs, not both.
+invoice.payment_methods=[{chain_slug:'ethereum',asset_tickers:['USDC'],asset_ids:['fixture']}];
+// @ts-expect-error Lightning only receives BTC.
+invoice.payment_methods=[{chain_slug:'bitcoin',payment_rail:'lightning',asset_tickers:['USDC']}];
 // @ts-expect-error Lightning cannot be combined with on-chain asset IDs.
 const badRail: InvoiceCreate={amount:'1',payment_methods:[{chain_slug:'bitcoin',payment_rail:'lightning',asset_ids:['fixture']}]};
 async function example() {

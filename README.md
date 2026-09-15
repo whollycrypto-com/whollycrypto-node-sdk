@@ -4,7 +4,7 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.2.0** targets merchant API **v1**, tested against merchant **5.1.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.3.0** targets merchant API **v1**, tested against merchant **5.3.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.2.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.2.0/whollycrypto-2.2.0.tgz).
+1. [Download the prebuilt SDK 2.3.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.3.0/whollycrypto-2.3.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -107,18 +107,22 @@ For a long-running application, reuse one client and close it during shutdown af
 
 ## Choose invoice payment methods
 
-Merchant 5.1.0+ accepts an invoice-specific subset of the store's accepted methods:
+Merchant 5.3.0+ accepts chain-specific tickers for an invoice's payment methods:
 
 ```javascript
 payload.payment_methods = [
-  {chain_slug: 'ethereum', asset_ids: [storeUsdcAssetId]},
+  {chain_slug: 'ethereum', asset_tickers: ['USDC', 'USDT']},
   {chain_slug: 'bitcoin', payment_rail: 'lightning'},
 ];
 ```
 
-Get `storeUsdcAssetId` from `await client.listStorePaymentAssets(projectId, storeId)`:
-use a selected entry's `asset.id`, not its contract, symbol or invoice method ID.
-Omit `asset_ids` for all ready accepted assets on the chain. Omit `payment_methods`
+Copy a selection from **Project → Stores → Payment methods**, or read the selected
+entries from `await client.listStorePaymentAssets(projectId, storeId)`.
+Tickers are trimmed and matched case-insensitively, within that chain and store.
+If two accepted contracts share a ticker, the request fails even when one is not ready.
+Use `asset_ids: [entry.asset.id]` to disambiguate (supported since merchant 5.1.0).
+Never combine non-null `asset_ids` and `asset_tickers` in one selection.
+Omit both for all ready accepted assets on the chain. Omit `payment_methods`
 or use `null` for all store methods; `[]` is invalid. Bitcoin Lightning is separate
 from on-chain Bitcoin. Maximum 64 methods; disabled, wrong-chain or unavailable
 choices fail. Store settings are unchanged. Keep the exact payload and idempotency
