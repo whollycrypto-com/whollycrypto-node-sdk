@@ -24,7 +24,9 @@ export interface CheckoutAppearanceOverride {
   support_email?: string; support_url?: string; terms_url?: string; privacy_url?: string;
   return_button_text?: string;
 }
-/** A store subset. Tickers require merchant 5.3.0+. Ambiguous tickers require asset_ids. */
+/** Store filter: 5.4.0+ ignores inactive/unaccepted choices, defaults if none match.
+ * Chain-only includes all active assets. Active methods still need readiness/rates.
+ * Tickers require 5.3.0+; ambiguous symbols require asset_ids. */
 export type InvoicePaymentSelection =
   | {chain_slug: string; payment_rail?: 'onchain'; asset_ids?: UUID[] | null; asset_tickers?: null}
   | {chain_slug: string; payment_rail?: 'onchain'; asset_tickers: string[]; asset_ids?: null}
