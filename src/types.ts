@@ -115,10 +115,15 @@ export interface PaymentAsset extends APIObject {
 export interface ProjectPaymentAsset extends APIObject {
   asset: PaymentAsset; wallet_readiness: string;
   policy?: AssetPolicyUpdate; wallet?: APIObject | null;
+  receive_readiness?: ReceiveReadiness | null;
+}
+export interface ReceiveReadiness extends APIObject {
+  ready: boolean; checked_at: string; issues: Array<Record<string, unknown>>;
 }
 export interface StorePaymentAsset extends APIObject {
   asset: PaymentAsset; selected: boolean; display_order: number;
   project_policy?: Partial<AssetPolicyUpdate>; wallet_readiness?: string; wallet?: APIObject | null;
+  receive_readiness?: ReceiveReadiness | null;
   confirmation_policy?: {
     finality_mode: string; project_required_confirmations: number;
     override_required_confirmations: number | null; effective_required_confirmations: number;
@@ -139,6 +144,7 @@ export interface WalletBalance extends APIObject {
 }
 export interface Wallet extends APIObject {
   id: UUID; balances: WalletBalance[];
+  receive_readiness?: ReceiveReadiness | null;
   project_id?: UUID; chain_slug?: string; network?: string; status?: string; label?: string | null;
   public_key?: string | null; primary_address?: string | null;
   total_value_usd?: DecimalString | null; balance_status?: string; balance_checked_at?: string | null;

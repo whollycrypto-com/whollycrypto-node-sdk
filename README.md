@@ -4,7 +4,7 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.3.1** targets merchant API **v1**, tested against merchant **5.4.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.4.0** targets merchant API **v1**, tested against merchant **5.5.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.3.1](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.3.1/whollycrypto-2.3.1.tgz).
+1. [Download the prebuilt SDK 2.4.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.4.0/whollycrypto-2.4.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -130,8 +130,10 @@ still need ready wallets/scanners and trustworthy rates; this never enables an a
 Maximum 64 methods; store settings stay unchanged. Older merchants reject unmatched
 choices. Keep the exact payload and idempotency key for retries.
 `InvoicePaymentSelection` is exported for TypeScript users.
-For failed creation, inspect `APIError.apiMessage` and the explicit response's
-`error.details.payment_methods` for the chain, ticker and missing requirement.
+For failed creation, inspect `error.paymentMethodIssues` on an `APIError`
+for the chain, ticker, `reason_code`, provider counts
+and action. SDK 2.4.0+ includes safe scanner/wallet/rate guidance in `error.message`;
+`error.details` and `error.apiMessage` remain explicit private diagnostics.
 Keep these diagnostics private; do not log whole customer response bodies.
 See [the selection schema and examples](https://www.whollycrypto.com/api/#create-invoice).
 

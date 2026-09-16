@@ -5,7 +5,7 @@ import {createHmac} from 'node:crypto';
 import * as sdk from './whollycrypto-node-sdk/dist/index.mjs';
 
 const cjs = createRequire(import.meta.url)('./whollycrypto-node-sdk/dist/index.js');
-assert.equal(sdk.VERSION, '2.3.1');
+assert.equal(sdk.VERSION, '2.4.0');
 for (const name of Object.keys(sdk)) assert.equal(sdk[name], cjs[name]);
 const project = '11111111-1111-4111-8111-111111111111';
 const store = '22222222-2222-4222-8222-222222222222';

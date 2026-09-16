@@ -10,7 +10,7 @@ const fixture=JSON.parse(await readFile(new URL('./fixtures/api-v1.json',import.
 
 test('ESM and CommonJS use the same classes and version',()=>{
   const sdk=createRequire(import.meta.url)('whollycrypto');
-  assert.equal(VERSION,'2.3.1');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
+  assert.equal(VERSION,'2.4.0');assert.equal(DefaultClient,Client);assert.equal(sdk.Client,Client);
   assert.equal(sdk.APIError,APIError);assert.equal(sdk.default,Client);
 });
 test('all 18 merchant endpoints match public fixtures and authorization',async t=>{
@@ -84,6 +84,18 @@ test('private response details do not leak through errors or client inspection',
   });
   const request=new HTTPRequest('POST','https://api.example.test/',{Authorization:TOKEN},Buffer.from(TOKEN));
   assert.ok(!inspect(request,{showHidden:true}).includes(TOKEN));assert.throws(()=>JSON.stringify(request),TypeError);assert.throws(()=>JSON.stringify(client),TypeError);
+});
+test('payment readiness errors are actionable without leaking remote text',()=>{
+  const issue={chain_slug:'tron',asset_ticker:TOKEN,reason_code:'scanner_provider_quorum',usable_independent_providers:1,message:TOKEN};
+  const error=new APIError(reply({error:{details:{payment_methods:[issue,issue]}}},400),'invalid_payment_request',TOKEN);
+  assert.match(error.message,/TRON: 1 of 2 independent scanner providers/);
+  assert.equal(error.message.split('TRON:').length,2);
+  assert.deepEqual(error.paymentMethodIssues,[issue,issue]);
+  for(const view of [String(error),inspect(error,{showHidden:true}),JSON.stringify(error)])assert.ok(!view.includes(TOKEN));
+  for(const issues of [null,1,'bad',[{reason_code:[]}],[{chain_slug:TOKEN,reason_code:'rate_unavailable',message:TOKEN}],[{chain_slug:'tron',reason_code:'scanner_provider_quorum',usable_independent_providers:TOKEN}]]){
+    const e=new APIError(reply({error:{details:{payment_methods:issues}}},400),'invalid_payment_request',TOKEN);assert.ok(!e.message.includes(TOKEN));
+  }
+  assert.deepEqual(new APIError(new HTTPResponse(400,{},Buffer.from('not JSON')),'http_error',null).details,{});
 });
 test('redirects, invalid JSON and malformed envelopes fail safely',async()=>{
   for(const text of ['[]','{"x":1,"x":2}','{"__proto__":1,"__proto__":2}','{"x":NaN}','{"x":Infinity}','{"x":01}','{"x":1,}','{"x":"\\ud800"}', '{"x":'+ '['.repeat(34)+'0'+']'.repeat(34)+'}']){
