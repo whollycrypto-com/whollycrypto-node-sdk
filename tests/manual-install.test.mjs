@@ -16,7 +16,7 @@ test('manual installation outside a Node project needs no npm or node_modules', 
     writeFileSync(join(directory, 'app.cjs'), `
       const assert = require('node:assert/strict');
       const {Client, VERSION} = require('./whollycrypto-node-sdk/dist/index.js');
-      assert.equal(VERSION, '2.4.0');
+      assert.equal(VERSION, '2.5.0');
       const client = new Client('https://api.example.test', 'wc_fixture_not_a_real_credential');
       assert.equal(client.lastResponse, null);
       client.close();

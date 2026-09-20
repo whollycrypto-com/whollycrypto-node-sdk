@@ -19,6 +19,7 @@ export interface CheckoutAppearanceOverride {
   logo_size?: 'small' | 'medium' | 'large'; logo_alignment?: 'left' | 'center';
   images?: Partial<Record<CheckoutImageKind, {store_id: UUID; kind?: CheckoutImageKind} | null>>;
   show_order_id?: boolean; show_description?: boolean; details_expanded?: boolean;
+  show_project_name?: boolean; show_store_name?: boolean;
   featured_chains?: string[]; featured_asset_ids?: UUID[]; default_asset_id?: UUID | null;
   messages?: Partial<Record<'en' | 'de', Partial<Record<CheckoutState, string>>>>;
   support_email?: string; support_url?: string; terms_url?: string; privacy_url?: string;

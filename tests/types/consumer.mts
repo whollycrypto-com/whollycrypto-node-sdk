@@ -1,6 +1,6 @@
 import Client, {Client as NamedClient, CheckoutClient, parseNotification, APIError, HTTPTransport, type InvoiceCreate, type CustomTokenRegistration} from 'whollycrypto';
 const client: NamedClient = new Client('https://api.example.com','fixture');
-const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',checkout_appearance:{intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'}}}};
+const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',checkout_appearance:{show_project_name:true,show_store_name:false,intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'}}}};
 invoice.payment_methods=[{chain_slug:'ethereum',asset_ids:['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa']},{chain_slug:'bitcoin',payment_rail:'lightning'}];
 invoice.payment_methods=[{chain_slug:'ethereum',asset_tickers:['USDC','USDT']},{chain_slug:'bitcoin',payment_rail:'lightning',asset_tickers:['BTC']}];
 // @ts-expect-error Select tickers or UUIDs, not both.

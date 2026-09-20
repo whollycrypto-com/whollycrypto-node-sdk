@@ -8,7 +8,7 @@ import {resolveOptions, type ClientOptions, type RequestOptions, type ResolvedOp
 import {origin, queryString, requestSignal} from './validation.js';
 import type {Query} from './types.js';
 
-export const VERSION = '2.4.0';
+export const VERSION = '2.5.0';
 export class JSONClient {
   readonly #origin: string;
   readonly #token: string | undefined;

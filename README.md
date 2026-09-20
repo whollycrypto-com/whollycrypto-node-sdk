@@ -4,7 +4,7 @@
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.4.0** targets merchant API **v1**, tested against merchant **5.5.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.5.0** targets merchant API **v1**, tested against merchant **5.6.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +18,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.4.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.4.0/whollycrypto-2.4.0.tgz).
+1. [Download the prebuilt SDK 2.5.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.5.0/whollycrypto-2.5.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
@@ -156,6 +156,8 @@ const payload: InvoiceCreate = {
     countryiso2: 'DE', company: 'Example GmbH', vatid: 'DE123456789',
   },
   checkout_appearance: {
+    show_project_name: true,
+    show_store_name: false,
     title: 'Complete your order', intro: 'Thanks for choosing us.',
     outro: 'Questions? https://your-shop.com/help',
     intro_font_size: 18, outro_font_size: 16,
@@ -171,6 +173,12 @@ Omitted settings inherit store defaults. Omit optional object properties instead
 Every method preserves the **full response envelope**, including `data`, `links`, `pagination` and reconciliation's separate top-level fields. Known fields have types; additional response fields remain accessible as `unknown`. Types describe the API contract, not complete runtime schema validation.
 
 ### Exact amounts
+
+Merchant 5.6.0 adds these name-visibility controls. They affect the checkout header,
+not identity fields in JSON. In **Store → Basic → Store domains**, choose preferred
+checkout and API hosts. Links use this store, then its default store, then the
+system primary; only active domains qualify. Set your SDK base URL to the preferred
+API host. Already-signed callback retries keep their original links.
 
 Amounts, spread, tolerance and fixed token prices require **plain decimal strings**. Numbers, `bigint`, exponent notation and custom decimal objects are rejected for these inputs. Convert your decimal-library value to an exact non-exponent string first, never through `Number`.
 

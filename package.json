@@ -1,6 +1,6 @@
 {
   "name": "whollycrypto",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Official Node.js SDK for the Wholly Crypto merchant API, with JavaScript and TypeScript support.",
   "license": "MIT",
   "author": "Wholly Crypto",
