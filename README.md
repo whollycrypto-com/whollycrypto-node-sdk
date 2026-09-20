@@ -232,9 +232,11 @@ Keep amounts as decimal strings from the start. `String(amount)` converts a vari
 
 IPN sends every generated invoice event to the store default URL or invoice's `ipn_url`. Webhooks send only selected events. Both deliver the same JSON snapshot. Use **Store → IPN's secret for IPN** and **the individual webhook endpoint's secret for webhooks**, never an API token. Rotating one does not rotate the others. Pass the **exact raw body bytes**, before JSON parsing.
 
-**Fulfil on `status = settled`, not `processing` or `amount_status = paid`.** Invoice statuses are `new`, `processing`, `settled`, `expired`, `invalid`, `cancelled`. Underpaid/overpaid use `amount_status`; lateness uses `timing_status`.
+**For event-based handling, trigger an order check on `event_type = invoice.settled` with `status = settled`. Verify the current invoice and fulfil once.** `status` is a state snapshot; `event_type` explains what happened. `payment.received` can already carry `settled` when first detected (for example, on Solana), or `processing` while confirmations are pending. Do not credit both.
 
-The body contains `invoice_id` (public UUID), `status`, `amount_status`, `timing_status`, `resolution`, `sequence`, `amount`, `currency`, `order_id`. `amount` is the invoice total, not crypto received. Event names, transaction hashes, chain/token, customer data and metadata are not sent; fetch the full invoice via API.
+The supplied receiver is **state-based**: it groups project + `invoice_id` + `sequence`. Its worker checks the saved/current state regardless of event type. Do not add an `invoice.settled`-only filter after grouping: `payment.received` may have arrived first with the same settled revision. An event-based inbox instead preserves distinct signed `event_id` values. Both approaches need separate invoice/order-level fulfil-once protection.
+
+Invoice statuses are `new`, `processing`, `settled`, `expired`, `invalid`, `cancelled`. `amount_status = paid` includes tolerance, not confirmation finality. Use `resolution` and `requires_review` for your exception policy. Version 2 includes signed event identity, `payment_info`, chain/token transfers, customer data and metadata. `amount`/`currency` are the original invoice total, not crypto received. Fetch the current invoice before fulfilment.
 
 [IPN/webhook setup and receiver example](examples/ipn-webhooks.md) · [Integration guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Event table and full payload](https://www.whollycrypto.com/api/#notifications). Also available in your console at `/settings/api/docs/#notifications`.
 

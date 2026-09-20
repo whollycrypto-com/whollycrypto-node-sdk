@@ -8,6 +8,9 @@ import {InvalidSignatureError, parseNotification} from 'whollycrypto';
  * enqueue must commit to YOUR durable database/queue before resolving. Reject on
  * storage failure. It must atomically deduplicate the replayKey and reject conflicting
  * invoiceState values, not raw bodies: multiple event types share one revision.
+ * Do not filter event_type after this grouping: payment.received can carry
+ * settled with the same sequence as invoice.settled. The worker checks current
+ * state and fulfils once. See ipn-webhooks.md for both receiver approaches.
  * Event/delivery headers are unsigned and must never be the unique key.
  * This module starts no server and performs no fulfilment or payment writes.
  */
