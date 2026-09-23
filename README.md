@@ -126,7 +126,11 @@ Omit both to include all active accepted assets on that chain. Omit `payment_met
 or use `null` for store defaults; `[]` is invalid. Lightning is separate.
 On merchant **5.4.0+**, unknown, inactive, wrong-chain or unaccepted choices are
 ignored. If none match, the invoice uses store defaults. Active selected methods
-still need ready wallets/scanners and trustworthy rates; this never enables an asset.
+still need configured wallets and trustworthy rates; this never enables an asset.
+Merchant 6.0.6+ keeps configured on-chain methods during temporary scanner outages.
+Detection waits for verified recovery; scanner warnings do not block creation.
+`receive_readiness.invoice_creatable` distinguishes configuration eligibility from
+`ready`. Monero/Lightning still require their service to issue payment requests.
 Maximum 64 methods; store settings stay unchanged. Older merchants reject unmatched
 choices. Keep the exact payload and idempotency key for retries.
 `InvoicePaymentSelection` is exported for TypeScript users.

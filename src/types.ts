@@ -26,7 +26,8 @@ export interface CheckoutAppearanceOverride {
   return_button_text?: string;
 }
 /** Store filter: 5.4.0+ ignores inactive/unaccepted choices, defaults if none match.
- * Chain-only includes all active assets. Active methods still need readiness/rates.
+ * Chain-only includes all active assets. Wallet setup/rates remain required;
+ * 6.0.6+ keeps on-chain methods during temporary scanner outages.
  * Tickers require 5.3.0+; ambiguous symbols require asset_ids. */
 export type InvoicePaymentSelection =
   | {chain_slug: string; payment_rail?: 'onchain'; asset_ids?: UUID[] | null; asset_tickers?: null}
@@ -120,6 +121,9 @@ export interface ProjectPaymentAsset extends APIObject {
 }
 export interface ReceiveReadiness extends APIObject {
   ready: boolean; checked_at: string; issues: Array<Record<string, unknown>>;
+  /** 6.0.6+: configuration permits creation despite temporary scanner warnings.
+   * Currency pricing is still checked when creating an invoice. */
+  invoice_creatable?: boolean;
 }
 export interface StorePaymentAsset extends APIObject {
   asset: PaymentAsset; selected: boolean; display_order: number;
