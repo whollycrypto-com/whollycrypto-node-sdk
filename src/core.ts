@@ -8,7 +8,7 @@ import {resolveOptions, type ClientOptions, type RequestOptions, type ResolvedOp
 import {origin, queryString, requestSignal} from './validation.js';
 import type {Query} from './types.js';
 
-export const VERSION = '2.5.0';
+export const VERSION = '2.6.0';
 export class JSONClient {
   readonly #origin: string;
   readonly #token: string | undefined;
@@ -87,9 +87,11 @@ export class JSONClient {
       try { const decoded = decodeJSON(response.body); if (isObject(decoded)) data = decoded; } catch { /* Never print a response body. */ }
     }
     if (status < 200 || status >= 300) {
-      const serverCode = data?.error;
+      const nested = isObject(data?.error) ? data.error : null;
+      const serverCode = nested?.code ?? data?.error;
       const code = typeof serverCode === 'string' && /^[a-z0-9_]{1,80}$/.test(serverCode) && !(this.#token && serverCode.includes(this.#token)) ? serverCode : 'http_error';
-      const message = typeof data?.message === 'string' ? data.message.slice(0,4096) : null;
+      const serverMessage = nested?.message ?? data?.message;
+      const message = typeof serverMessage === 'string' ? serverMessage.slice(0,4096) : null;
       throw new APIError(response, code, message);
     }
     if (data === null) throw new InvalidResponseError('Expected a valid JSON object response. Check the API domain and proxy configuration.');

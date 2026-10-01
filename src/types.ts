@@ -44,6 +44,20 @@ export interface InvoiceCreate {
 }
 /** Known fields are typed; additional response fields remain accessible as unknown. */
 export interface APIObject { [key: string]: unknown; }
+export type OperatorOnboarding =
+  | {onboarding:'direct'; password:string; require_password_change?:boolean; send_invitation_email?:false}
+  | {onboarding:'invitation'; password?:never; require_password_change?:false; send_invitation_email?:boolean};
+export type OperatorMerchantCreate = APIObject & OperatorOnboarding & {
+  name:string; email:string; currency?:string; fee_bps?:number;
+  starting_credit?:DecimalString; external_id?:string; default_timezone?:string;
+};
+export type OperatorUserCreate = APIObject & OperatorOnboarding & {
+  email:string; display_name:string; access_level?:'admin'|'projects';
+  project_ids?:UUID[]; default_timezone?:string;
+};
+export interface OperatorCreditAdjustment extends APIObject {amount:DecimalString; note:string; request_id:UUID;}
+export interface OperatorTopupCreate extends APIObject {amount:DecimalString; request_id:UUID;}
+export interface OperatorPage<T=APIObject> extends APIObject {data:T[]; page:number; page_size:number; total:number;}
 export interface Envelope<T> extends APIObject { data: T; }
 export interface Invoice extends APIObject {
   id: UUID; invoice_id: UUID; project_id: UUID; store_id: UUID;

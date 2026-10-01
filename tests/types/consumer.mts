@@ -1,4 +1,14 @@
-import Client, {Client as NamedClient, CheckoutClient, parseNotification, APIError, HTTPTransport, type InvoiceCreate, type CustomTokenRegistration} from 'whollycrypto';
+import Client, {Client as NamedClient, CheckoutClient, OperatorClient, OperatorOnboardingClient, parseNotification, APIError, HTTPTransport, type InvoiceCreate, type CustomTokenRegistration, type OperatorMerchantCreate} from 'whollycrypto';
+const operator=new OperatorClient('https://api.example.com','wc_operator_'+'a'.repeat(32)+'_'+'b'.repeat(64));
+const hosted:OperatorMerchantCreate={name:'Example',email:'merchant@example.test',currency:'EUR',onboarding:'direct',password:'a long synthetic password',require_password_change:true};
+async function operatorExample(){await operator.createMerchant(hosted,'saved-request-key-1');await new OperatorOnboardingClient('https://api.example.com').checkInvitation('example');}
+// @ts-expect-error Direct onboarding requires a password.
+const missingPassword:OperatorMerchantCreate={name:'Example',email:'merchant@example.test',onboarding:'direct'};
+// @ts-expect-error Invitation does not take a password.
+const invitationPassword:OperatorMerchantCreate={name:'Example',email:'merchant@example.test',onboarding:'invitation',password:'not allowed'};
+// @ts-expect-error Credit amounts must be decimal strings.
+operator.adjustCredits('id',{amount:5,note:'Test',request_id:'id'},'request-key-12345');
+void [operatorExample,missingPassword,invitationPassword];
 const client: NamedClient = new Client('https://api.example.com','fixture');
 const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',checkout_appearance:{show_project_name:true,show_store_name:false,intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'}}}};
 invoice.payment_methods=[{chain_slug:'ethereum',asset_ids:['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa']},{chain_slug:'bitcoin',payment_rail:'lightning'}];

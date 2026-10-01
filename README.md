@@ -1,10 +1,16 @@
 # Wholly Crypto Node.js SDK
 
+Operator integrations (Wholly Crypto 7.4.0+): use the separate `OperatorClient`
+to provision hosted merchants directly or by invitation, manage users, credits,
+projects/stores and signed lifecycle callbacks. See the [Operator API guide](docs/operator-api.md)
+and [onboarding example](examples/operator.mjs).
+Operator keys stay on your server and are never shared with hosted merchants.
+
 **Merchant 4 upgrade:** read `data.invoice_id` from invoice creation/detail and `invoice_id` from list rows. It matches the callback `invoice_id`. The server no longer returns `public_id`; internal `id` is not a checkout ID. Update custom response readers before upgrading your merchant. For older merchants, keep SDK 1.x or explicitly handle their older response shape.
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.5.0** targets merchant API **v1**, tested against merchant **5.6.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.6.0** targets merchant API **v1**, tested against merchant **7.4.0**. SDK and merchant versions are independent.
 
 ## Install
 
@@ -18,7 +24,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.5.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.5.0/whollycrypto-2.5.0.tgz).
+1. [Download the prebuilt SDK 2.6.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.6.0/whollycrypto-2.6.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 
