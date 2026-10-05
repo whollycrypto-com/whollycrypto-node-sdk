@@ -10,7 +10,7 @@ const invitationPassword:OperatorMerchantCreate={name:'Example',email:'merchant@
 operator.adjustCredits('id',{amount:5,note:'Test',request_id:'id'},'request-key-12345');
 void [operatorExample,missingPassword,invitationPassword];
 const client: NamedClient = new Client('https://api.example.com','fixture');
-const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',checkout_appearance:{show_project_name:true,show_store_name:false,intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'}}}};
+const invoice: InvoiceCreate = {amount:'1.00',currency:'EUR',language:'pt-BR',checkout_appearance:{show_project_name:true,show_store_name:false,intro:'Hello',intro_font_size:18,theme:'dim',images:{logo_light:{store_id:'fixture'}},messages:{en:{paid:'Thanks'},'pt-BR':{paid:'Valeu!'},'zh-CN':{paid:'谢谢'},ja:{paid:'ありがとう'}}}};
 invoice.payment_methods=[{chain_slug:'ethereum',asset_ids:['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa']},{chain_slug:'bitcoin',payment_rail:'lightning'}];
 invoice.payment_methods=[{chain_slug:'ethereum',asset_tickers:['USDC','USDT']},{chain_slug:'bitcoin',payment_rail:'lightning',asset_tickers:['BTC']}];
 // @ts-expect-error Select tickers or UUIDs, not both.
