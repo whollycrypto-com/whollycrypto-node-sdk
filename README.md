@@ -10,8 +10,19 @@ Operator keys stay on your server and are never shared with hosted merchants.
 
 The official JavaScript and TypeScript client for your **self-hosted Wholly Crypto merchant API**. Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
-One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.6.0** targets merchant API **v1**, tested against merchant **7.4.0**. SDK and merchant versions are independent.
+One package. **Node.js 22+**, CommonJS and ES modules, built-in TypeScript declarations, **no runtime dependencies**. MIT licensed. SDK **2.7.0** targets merchant API **v1**, tested against merchant **8.0.0**. SDK and merchant versions are independent.
 
+
+## Marketplace · merchant 8.0.0+
+
+Use the separate `MarketplaceClient` and a project-scoped `wc_marketplace_...` key
+for vendors, split invoices, protected balances, payout plans and signed events.
+BTC and supported EVM assets only. Keep spending keys on a trusted backend, never
+in customer JavaScript or a shipped mobile app. Writes require a saved retry key;
+preparing a payout does not authorize sending it.
+
+[Setup and safety](docs/marketplace-api.md) · [Invoice and payout example](examples/marketplace.mjs) ·
+[Signed event receiver](examples/marketplace-webhook.mjs) · [All endpoints](https://www.whollycrypto.com/api/#marketplace)
 ## Install
 
 ### With npm
@@ -24,7 +35,7 @@ Use this SDK on your **server**, not in a browser or mobile app. API keys must n
 
 ### Without npm (manual download)
 
-1. [Download the prebuilt SDK 2.6.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.6.0/whollycrypto-2.6.0.tgz).
+1. [Download the prebuilt SDK 2.7.0](https://github.com/whollycrypto-com/whollycrypto-node-sdk/releases/download/v2.7.0/whollycrypto-2.7.0.tgz).
 2. Extract the archive and rename its `package` folder to `whollycrypto-node-sdk`. Put it beside your application script.
 3. Keep `package.json` and the complete `dist/` folder together. Import the local entrypoint:
 

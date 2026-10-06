@@ -1,6 +1,6 @@
 {
   "name": "whollycrypto",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Official Node.js SDK for the Wholly Crypto merchant API, with JavaScript and TypeScript support.",
   "license": "MIT",
   "author": "Wholly Crypto",
@@ -49,7 +49,8 @@
     "CHANGELOG.md",
     "examples",
     "docs/payment-methods.md",
-    "docs/operator-api.md"
+    "docs/operator-api.md",
+    "docs/marketplace-api.md"
   ],
   "sideEffects": false,
   "publishConfig": {

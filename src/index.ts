@@ -1,6 +1,7 @@
 export {Client, Client as default} from './client.js';
 export {CheckoutClient} from './checkout.js';
 export {OperatorClient} from './operator.js';
+export {MarketplaceClient} from './marketplace.js';
 export {OperatorOnboardingClient} from './operator-onboarding.js';
 export {VERSION} from './core.js';
 export {HTTPRequest, HTTPResponse} from './models.js';
